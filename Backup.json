@@ -1,0 +1,294 @@
+{
+  "name": "Backup",
+  "nodes": [
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        64
+      ],
+      "id": "0bc54734-7f7a-44e6-9f98-33ddb4194e28",
+      "name": "n8n",
+      "credentials": {
+        "n8nApi": {
+          "id": "MDp3LciHGULR8FrR",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1/n8n-backups",
+          "mode": "url"
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        64
+      ],
+      "id": "5a4269d0-aec8-42b8-94b7-d4231f7c6cb0",
+      "name": "GitHub",
+      "webhookId": "7cbcdbc4-b5de-44ff-931a-d1ca4bdfbe38",
+      "alwaysOutputData": false,
+      "notesInFlow": false,
+      "credentials": {
+        "githubApi": {
+          "id": "uEDeD6Y3oUMqOIWD",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        64
+      ],
+      "id": "6bc69475-6c7f-43c5-b674-9af33c89a090",
+      "name": "Convert to File",
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "73e000cf-e1a4-42cb-8293-05c0833a1e0f",
+              "leftValue": "={{ $('Code').item.json.combined_names }}",
+              "rightValue": "={{ $binary.data.fileName }}",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        64
+      ],
+      "id": "d2144b77-075b-4c8b-870a-14fb49cc0e97",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1/n8n-backups",
+          "mode": "url"
+        },
+        "filePath": "={{ $binary.data.fileName }}",
+        "fileContent": "data",
+        "commitMessage": "={{ new Date().toLocaleString({ day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}\n"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "e847d348-744f-4bbc-b6c7-202a7c16a26e",
+      "name": "Create File",
+      "webhookId": "ae777597-95a6-4e0c-9a56-6b4027549a24",
+      "credentials": {
+        "githubApi": {
+          "id": "uEDeD6Y3oUMqOIWD",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Acessa os itens do input\nconst items = $input.all();\n\n// Pega todos os nomes dos arquivos\nconst allNames = items.map(item => item.json.name);\n\n// Junta todos os nomes separados por vírgula\nconst combined = allNames.join(', ');\n\n// Retorna um item com a string combinada\nreturn [{\n  json: {\n    combined_names: combined\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        64
+      ],
+      "id": "805df9fb-9d92-4b36-a444-70f2d7e86c39",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "https://github.com/andregustavo1/n8n-backups",
+          "mode": "url"
+        },
+        "filePath": "={{ $binary.data.fileName }}",
+        "fileContent": "data",
+        "commitMessage": "={{ new Date().toLocaleString({ day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}\n"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        160
+      ],
+      "id": "726ae0e6-3521-4d2f-9488-970920ed1cf8",
+      "name": "Update File",
+      "webhookId": "ae777597-95a6-4e0c-9a56-6b4027549a24",
+      "credentials": {
+        "githubApi": {
+          "id": "uEDeD6Y3oUMqOIWD",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1568,
+        64
+      ],
+      "id": "8cc8f0ff-e236-4f06-a729-b591df109a4b",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "n8n": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7ea8c271-005a-4b1e-a32a-9cbe969346ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0a978865cf11c85e21174a52ad114fb11e6a78eeacd4233c3da4fa0ebea2b4af"
+  },
+  "id": "eKJwCmtuyh2dtjlk",
+  "tags": []
+}
